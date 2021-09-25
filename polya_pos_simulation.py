@@ -1,8 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-N = 10 # number of periods
-p = 0.00 # probability of slashing
+N = 50 # number of periods
+p = 0.00001 # probability of slashing
 s = .05 # slashing penalty (percentage)
 R0 = 10
 
@@ -46,7 +46,7 @@ def geometric_reward(stake: int, period: int, total_period: int) -> float:
     - period (int): current period.
     - total_period (int): total number of periods.
     """
-    power = stake / 10
+    power = 1000/stake
     return R0 * (1 - (period / total_period) ** power)
 
 def simulation(period = 200, reward_function = constant_reward):
@@ -60,7 +60,7 @@ def simulation(period = 200, reward_function = constant_reward):
     """
     stakes = np.zeros((period, N))
     stakes[0,:] = np.random.random(N) * 100 + 1
-    # stakes[0, 3] = 300
+    stakes[0, 3] = 300
     for t in range(1, period):
         chosen = np.random.choice(index, p = stakes[t-1,:]/np.sum(stakes[t-1,:]))
         stakes[t,:] = stakes[t-1,:]
@@ -111,7 +111,7 @@ def trace_plot(title, x_axis_title, y_axis_title, data):
     plt.show()
 
 if __name__ == "__main__":
-    stakes = simulation(period=100000, reward_function=constant_reward)
+    stakes = simulation(period=100000, reward_function=geometric_reward)
     delta_to_last = delta_first_last(stakes)
     delta_to_second = delta_first_second(stakes)
     trace_plot("Evolution of the stake for each mines", "Time", "Stake", stakes)
